@@ -5,4 +5,4 @@ this can be done using
 sudo chmod +x <downloaded jar>.jar
 ```
 
-ps. Make sure to have a jdk downloaded.
+ps. A jdk is required.
