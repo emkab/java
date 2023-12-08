@@ -1,7 +1,5 @@
 package Bezier;
 
-import res.BaseEntity;
-import res.Entity;
 import res.Vector2;
 import res.Window;
 
@@ -20,6 +18,7 @@ public class BezierWindow extends Window {
     }
 
     private HashMap<String, ControlPoint> controlPoints;
+    private HashMap<String, Color> controlPointColors;
     private int controlPointRadius = 20;
 
     private void setup() {
@@ -28,11 +27,21 @@ public class BezierWindow extends Window {
         controlPoints.put("P1", new ControlPoint());
         controlPoints.put("P2", new ControlPoint());
         controlPoints.put("P3", new ControlPoint());
+        controlPointColors = new HashMap<>();
+        controlPointColors.put("P0", Color.red);
+        controlPointColors.put("P1", Color.blue);
+        controlPointColors.put("P2", Color.green);
+        controlPointColors.put("P3", Color.yellow);
     }
 
     public void update() {
-        for (ControlPoint point : controlPoints.values()) {
-            drawCircle(point.pos, controlPointRadius, Color.blue, onscreen);
+        for (String pointKey : controlPoints.keySet()) {
+            Vector2 pos = controlPoints.get(pointKey).pos.get();
+            drawCircle(pos, controlPointRadius, controlPointColors.get(pointKey), onscreen);
+            Vector2 textPos;
+            textPos = pos;
+            textPos.y += controlPointRadius * 2;
+            write(pointKey, textPos, controlPointColors.get(pointKey), onscreen);
         }
     }
 
@@ -44,6 +53,12 @@ public class BezierWindow extends Window {
     public void drawCircle(Vector2 pos, int r, Color color, Graphics2D g2d) {
         Vector2 newPos = screen.normalToScreen(pos.x, pos.y);
         super.drawCircle((int) newPos.x, (int) newPos.y, r, color, g2d);
+    }
+
+    public void write(String string, Vector2 pos, Color color, Graphics2D g2d) {
+        Vector2 newPos = screen.normalToScreen(pos.x, pos.y);
+        onscreen.setColor(color);
+        onscreen.drawString(string, newPos.x, newPos.y);
     }
 
     @Override
