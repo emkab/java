@@ -51,8 +51,8 @@ public class BezierWindow extends Window {
 
         controlPoints = new HashMap<>();
         controlPoints.put("P0", new ControlPoint(new Vector2(100, 50)));
-        controlPoints.put("P1", new ControlPoint(new Vector2(50, -50)));
-        controlPoints.put("P2", new ControlPoint(new Vector2(-50, -50)));
+        controlPoints.put("P1", new ControlPoint(new Vector2(75, -50)));
+        controlPoints.put("P2", new ControlPoint(new Vector2(-75, -50)));
         controlPoints.put("P3", new ControlPoint(new Vector2(-100, 50)));
     }
 
@@ -70,8 +70,8 @@ public class BezierWindow extends Window {
         }
 
         if (drawLines) {
-            drawLine(controlPoints.get("P1").pos, controlPoints.get("P2").pos, palette.get("Line"), onscreen);
-            drawLine(controlPoints.get("P0").pos, controlPoints.get("P3").pos, palette.get("Line"), onscreen);
+            drawLine(controlPoints.get("P0").pos, controlPoints.get("P1").pos, palette.get("Line"), onscreen);
+            drawLine(controlPoints.get("P2").pos, controlPoints.get("P3").pos, palette.get("Line"), onscreen);
         }
 
         graphBezier(palette.get("Curve"), onscreen);
@@ -85,8 +85,8 @@ public class BezierWindow extends Window {
         Vector2 P3 = controlPoints.get("P3").pos;
         for (double t = 0.0; t <= 1.0; t += 0.001) {
 
-            double x = Math.pow(1 - t, 3) * P0.x + Math.pow(3 * t * (1 - t), 2) * P1.x + Math.pow(3 * t, 2) * (1 - t) * P2.x + Math.pow(t, 3) * P3.x;
-            double y = Math.pow(1 - t, 3) * P0.y + Math.pow(3 * t * (1 - t), 2) * P1.y + Math.pow(3 * t, 2) * (1 - t) * P2.y + Math.pow(t, 3) * P3.y;
+            double x = Math.pow(1 - t, 3) * P0.x + 3 * Math.pow((1 - t), 2) * t * P1.x + 3 * (1 - t) * Math.pow(t, 2) * P2.x + Math.pow(t, 3) * P3.x;
+            double y = Math.pow(1 - t, 3) * P0.y + 3 * Math.pow((1 - t), 2) * t * P1.y + 3 * (1 - t) * Math.pow(t, 2) * P2.y + Math.pow(t, 3) * P3.y;
             Vector2 pos = screen.normalToScreen((float) x, (float) y);
 
             g2d.drawRect((int) pos.x, (int) pos.y, 1, 1);
