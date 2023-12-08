@@ -107,7 +107,9 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         keysDown = new TreeSet<String>();
         processedKeys = new TreeSet<String>();
         unprocessedKeys = new TreeSet<String>();
+    }
 
+    protected void startThreads() {
         window.addComponentListener(this);
         draw.addComponentListener(this);
         draw.addMouseListener(this);
@@ -116,9 +118,6 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         window.addKeyListener(this);
         draw.addKeyListener(this);
         draw.requestFocus();
-
-
-//        Scanner s = new Scanner(System.in);
 
         (new Thread(this, "render")).start();
         (new Thread(this, "listen")).start();
@@ -130,8 +129,10 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         g2d.fillOval(x, y, r, r);
     }
 
+    public Color backgroundColor = Color.black;
+
     protected void drawBackground(Graphics2D g2d) {
-        g2d.setColor(Color.black);
+        g2d.setColor(backgroundColor);
         g2d.drawRect(0, 0, width, height);
         g2d.fillRect(0, 0, width, height);
 
