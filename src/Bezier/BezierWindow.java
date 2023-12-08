@@ -56,8 +56,11 @@ public class BezierWindow extends Window {
         controlPoints.put("P3", new ControlPoint(new Vector2(-100, 50)));
     }
 
+    boolean drawLines = true;
+
     public void update() {
         write("Drag points to edit the curve", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 15), palette.get("Line"), 16f, onscreen);
+        write("(Right-click to toggle connective lines)", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 30), palette.get("Line"), 12f, onscreen);
 
         for (String pointKey : controlPoints.keySet()) {
             Vector2 pos = controlPoints.get(pointKey).pos.get();
@@ -66,8 +69,10 @@ public class BezierWindow extends Window {
             write(pointKey, pos, palette.get(pointKey), 12f, onscreen);
         }
 
-        drawLine(controlPoints.get("P1").pos, controlPoints.get("P2").pos, palette.get("Line"), onscreen);
-        drawLine(controlPoints.get("P0").pos, controlPoints.get("P3").pos, palette.get("Line"), onscreen);
+        if (drawLines) {
+            drawLine(controlPoints.get("P1").pos, controlPoints.get("P2").pos, palette.get("Line"), onscreen);
+            drawLine(controlPoints.get("P0").pos, controlPoints.get("P3").pos, palette.get("Line"), onscreen);
+        }
 
         graphBezier(palette.get("Curve"), onscreen);
     }
@@ -110,6 +115,13 @@ public class BezierWindow extends Window {
         pos2 = screen.normalToScreen(pos2);
         g2d.setColor(color);
         g2d.drawLine((int) pos1.x, (int) pos1.y, (int) pos2.x, (int) pos2.y);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (e.getButton() == 3) {
+            drawLines = !drawLines;
+        }
     }
 
     @Override
