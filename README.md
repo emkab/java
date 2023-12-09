@@ -1,4 +1,4 @@
-# My java programs.
+# My java bezier program.
 Make sure to give executable permissions on linux when downloading the jars,
 this can be done using 
 ```bash
