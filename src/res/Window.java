@@ -123,9 +123,10 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         (new Thread(this, "listen")).start();
     }
 
-    public void drawCircle(int x, int y, int r, Color color, Graphics2D g2d) {
+    public void drawCircle(int x, int y, int r, Color color, Color fillColor, Graphics2D g2d) {
         g2d.setColor(color);
         g2d.drawOval(x, y, r, r);
+        g2d.setColor(fillColor);
         g2d.fillOval(x, y, r, r);
     }
 

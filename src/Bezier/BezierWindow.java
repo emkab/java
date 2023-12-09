@@ -45,6 +45,8 @@ public class BezierWindow extends Window {
         super.backgroundColor = palette.get("Background");
         palette.put("Curve", new Color(203, 213, 225));
         palette.put("Line", new Color(148, 163, 184));
+        palette.put("Box", new Color(113, 113, 122));
+        palette.put("Fill", new Color(39, 39, 42));
         palette.put("P0", new Color(220, 38, 38));
         palette.put("P1", new Color(37, 99, 235));
         palette.put("P2", new Color(234, 179, 8));
@@ -65,20 +67,21 @@ public class BezierWindow extends Window {
         write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 30), palette.get("Line"), 12f, onscreen);
         write("Prees 'b' to toggle bounding box", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
 
+        graphBezier(palette.get("Curve"), onscreen);
+
+        if (drawLines) {
+            drawLine(controlPoints.get("P0").pos, controlPoints.get("P1").pos, palette.get("Line"), 4, onscreen);
+            drawLine(controlPoints.get("P2").pos, controlPoints.get("P3").pos, palette.get("Line"), 4, onscreen);
+        }
+
+        if (drawBoundingBox) boundingBox(Color.red, Color.green, onscreen);
+
         for (String pointKey : controlPoints.keySet()) {
             Vector2 pos = controlPoints.get(pointKey).pos.get();
-            drawCircle(pos, controlPointRadius, palette.get(pointKey), onscreen);
+            drawCircle(pos, controlPointRadius, palette.get(pointKey), palette.get("Fill"), 10, onscreen);
             pos.y += (float) (controlPointRadius * 1.5);
             write(pointKey, pos, palette.get(pointKey), 12f, onscreen);
         }
-
-        if (drawLines) {
-            drawLine(controlPoints.get("P0").pos, controlPoints.get("P1").pos, palette.get("Line"), onscreen);
-            drawLine(controlPoints.get("P2").pos, controlPoints.get("P3").pos, palette.get("Line"), onscreen);
-        }
-
-        graphBezier(palette.get("Curve"), onscreen);
-        if (drawBoundingBox) boundingBox(Color.red, Color.green, onscreen);
     }
 
     private void graphBezier(Color color, Graphics2D g2d) {
@@ -89,6 +92,7 @@ public class BezierWindow extends Window {
         Vector2 P3 = controlPoints.get("P3").pos;
         for (double t = 0.0; t <= 1.0; t += 0.001) {
             Vector2 pos = screen.normalToScreen(getPointFromT(t));
+            g2d.setStroke(new BasicStroke(4));
             g2d.drawRect((int) pos.x, (int) pos.y, 1, 1);
         }
     }
@@ -98,18 +102,6 @@ public class BezierWindow extends Window {
         double[] rootsX = roots.get("X");
         double[] rootsY = roots.get("Y");
 
-        for (double root : rootsX) {
-            if (root != -1) {
-                Vector2 pos = getPointFromT(root);
-                drawCircle(pos, controlPointRadius / 2, xColor, onscreen);
-            }
-        }
-        for (double root : rootsY) {
-            if (root != -1) {
-                Vector2 pos = getPointFromT(root);
-                drawCircle(pos, controlPointRadius / 2, yColor, onscreen);
-            }
-        }
         Vector2 maxT = getPointFromT(1);
         Vector2 minT = getPointFromT(0);
         HashMap<String, Vector2> points = new HashMap<>();
@@ -139,13 +131,27 @@ public class BezierWindow extends Window {
         max = screen.normalToScreen(max);
         min = screen.normalToScreen(min);
 
-        drawRect(min, max, palette.get("Line"), onscreen);
+        drawRect(min, max, palette.get("Box"), 4, onscreen);
+
+        for (double root : rootsX) {
+            if (root != -1) {
+                Vector2 pos = getPointFromT(root);
+                drawCircle(pos, controlPointRadius / 2, xColor, palette.get("Fill"), 10, onscreen);
+            }
+        }
+        for (double root : rootsY) {
+            if (root != -1) {
+                Vector2 pos = getPointFromT(root);
+                drawCircle(pos, controlPointRadius / 2, yColor, palette.get("Fill"), 10, onscreen);
+            }
+        }
     }
 
-    private void drawRect(Vector2 pos1, Vector2 pos2, Color color, Graphics2D g2d) {
+    private void drawRect(Vector2 pos1, Vector2 pos2, Color color, float strokeSize, Graphics2D g2d) {
         double width = pos1.distanceX(pos2);
         double height = pos1.distanceY(pos2);
         g2d.setColor(color);
+        g2d.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2d.drawRect((int) pos1.x, (int) pos1.y, (int) width, (int) height);
     }
 
@@ -224,14 +230,16 @@ public class BezierWindow extends Window {
         return -1;
     }
 
-    public void drawCircle(int x, int y, int r, Color color, Graphics2D g2d) {
+    public void drawCircle(int x, int y, int r, Color color, Color fillColor, float strokeSize, Graphics2D g2d) {
         Vector2 newPos = screen.normalToScreen(x, y);
-        super.drawCircle((int) newPos.x - r / 2, (int) newPos.y - r / 2, r, color, g2d);
+        g2d.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        super.drawCircle((int) newPos.x - r / 2, (int) newPos.y - r / 2, r, color, fillColor, g2d);
     }
 
-    public void drawCircle(Vector2 pos, int r, Color color, Graphics2D g2d) {
+    public void drawCircle(Vector2 pos, int r, Color color, Color fillColor, float strokeSize, Graphics2D g2d) {
         Vector2 newPos = screen.normalToScreen(pos.x, pos.y);
-        super.drawCircle((int) newPos.x - r / 2, (int) newPos.y - r / 2, r, color, g2d);
+        g2d.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        super.drawCircle((int) newPos.x - r / 2, (int) newPos.y - r / 2, r, color, fillColor, g2d);
     }
 
     public void write(String string, Vector2 pos, Color color, float fontSize, Graphics2D g2d) {
@@ -241,10 +249,11 @@ public class BezierWindow extends Window {
         g2d.drawString(string, newPos.x, newPos.y);
     }
 
-    public void drawLine(Vector2 pos1, Vector2 pos2, Color color, Graphics2D g2d) {
+    public void drawLine(Vector2 pos1, Vector2 pos2, Color color, float strokeSize, Graphics2D g2d) {
         pos1 = screen.normalToScreen(pos1);
         pos2 = screen.normalToScreen(pos2);
         g2d.setColor(color);
+        g2d.setStroke(new BasicStroke(strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2d.drawLine((int) pos1.x, (int) pos1.y, (int) pos2.x, (int) pos2.y);
     }
 
