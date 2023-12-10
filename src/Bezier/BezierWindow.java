@@ -6,6 +6,7 @@ import res.Window;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ public class BezierWindow extends Window {
     private HashMap<String, Color> palette;
     private HashMap<String, ControlPoint> controlPoints;
     private int controlPointRadius = 20;
+    private Float[] arcLength;
 
     private void setup() {
         palette = new HashMap<>();
@@ -57,15 +59,19 @@ public class BezierWindow extends Window {
         controlPoints.put("P1", new ControlPoint(new Vector2(75, -50)));
         controlPoints.put("P2", new ControlPoint(new Vector2(-75, -50)));
         controlPoints.put("P3", new ControlPoint(new Vector2(-100, 50)));
+
+        arcLength = new Float[1000];
     }
 
     boolean drawLines = false;
     boolean drawBoundingBox = false;
 
     public void update() {
-        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 15), palette.get("Line"), 16f, onscreen);
-        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 30), palette.get("Line"), 12f, onscreen);
-        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
+        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 15), palette.get("Line"), 16f, onscreen);
+        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 30), palette.get("Line"), 12f, onscreen);
+        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
+        write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 60), palette.get("Line"), 12f, onscreen);
+        write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 75), palette.get("Line"), 12f, onscreen);
 
         graphBezier(palette.get("Curve"), onscreen);
 
@@ -83,17 +89,52 @@ public class BezierWindow extends Window {
             write(pointKey, pos, palette.get(pointKey), 12f, onscreen);
         }
     }
-
+    boolean playAnimation;
     private void graphBezier(Color color, Graphics2D g2d) {
         g2d.setColor(color);
-        Vector2 P0 = controlPoints.get("P0").pos;
-        Vector2 P1 = controlPoints.get("P1").pos;
-        Vector2 P2 = controlPoints.get("P2").pos;
-        Vector2 P3 = controlPoints.get("P3").pos;
+        int i = 0;
         for (double t = 0.0; t <= 1.0; t += 0.001) {
-            Vector2 pos = screen.normalToScreen(getPointFromT(t));
+            Vector2 pos = getPointFromT(t);
+            calcArcLength(i, pos);
+            pos = screen.normalToScreen(pos);
             g2d.setStroke(new BasicStroke(4));
             g2d.drawRect((int) pos.x, (int) pos.y, 1, 1);
+            i++;
+        }
+       if (playAnimation) dotAnimation();
+    }
+
+    private void calcArcLength(int i, Vector2 point) {
+        if (i != 0) arcLength[i] = arcLength[i -1] + point.distance(getPointFromT(getTFromI(i - 1)));
+        if (i == 0) arcLength[i] = 0f;
+    }
+
+    private double getTFromI(int i) {return i / 1000.0;}
+
+    private float distToT(float distance) {
+        float length = arcLength[arcLength.length - 1];
+        int n = arcLength.length;
+
+        if (distance >= 0 && distance <= length) {
+            for (int i = 0; i < n; i++) {
+                if (distance >= arcLength[i] && distance <= arcLength[i+1]) {
+                    return (float) ((getTFromI(i) + getTFromI(i + 1)) / 2);
+                }
+            }
+        }
+        return distance/length;
+    }
+    float[] dots;
+    int dotNum = 10;
+    float animationSpeed = 500;
+    private void dotAnimation() {
+        for (int i = 0; i < dots.length; i++) {
+            Vector2 pos = getPointFromT(distToT(dots[i]));
+            pos = screen.normalToScreen(pos);
+            drawCircle((int) pos.x, (int) pos.y, controlPointRadius / 2, palette.get("Line"), palette.get("Fill"), onscreen);
+
+            dots[i] += arcLength[arcLength.length - 1] / animationSpeed;
+            if (dots[i] > arcLength[arcLength.length - 1]) dots[i] = 0f;
         }
     }
 
@@ -259,7 +300,20 @@ public class BezierWindow extends Window {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == 17) ctrlPressed = true;
         if (e.getKeyChar() == 'b') drawBoundingBox = !drawBoundingBox;
+        if (e.getKeyChar() == ' ') {
+            dots = new float[dotNum];
+            for (int i = 0; i < dots.length; i++) {
+                dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
+            }
+            playAnimation = !playAnimation;
+        }
+    }
+    boolean ctrlPressed = false;
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == 17) ctrlPressed = false;
     }
 
     @Override
@@ -274,8 +328,22 @@ public class BezierWindow extends Window {
         for (ControlPoint point : controlPoints.values()) {
             if (point.pos.distance(screen.screenToNormal(e.getX(), e.getY())) <= controlPointRadius) {
                 point.pos = screen.screenToNormal(e.getX(), e.getY());
+                dots = new float[dotNum];
+                for (int i = 0; i < dots.length; i++) {
+                    dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
+                }
                 break;
             }
+        }
+    }
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        if (ctrlPressed) {
+            if (Math.signum(e.getUnitsToScroll()) == -1) animationSpeed -= 10;
+            if (Math.signum(e.getUnitsToScroll()) == 1) animationSpeed += 10;
+            if (animationSpeed <= 0) animationSpeed = 1;
+            if (animationSpeed > 700) animationSpeed = 700;
         }
     }
 }
