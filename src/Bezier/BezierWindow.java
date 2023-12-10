@@ -65,7 +65,7 @@ public class BezierWindow extends Window {
     public void update() {
         write("Drag points to edit the curve", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 15), palette.get("Line"), 16f, onscreen);
         write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 30), palette.get("Line"), 12f, onscreen);
-        write("Prees 'b' to toggle bounding box", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
+        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 5, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
 
         graphBezier(palette.get("Curve"), onscreen);
 
