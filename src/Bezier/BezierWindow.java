@@ -1,9 +1,11 @@
 package Bezier;
 
+import res.Screen;
 import res.Vector2;
 import res.Window;
 
 import java.awt.*;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -67,12 +69,13 @@ public class BezierWindow extends Window {
     boolean drawBoundingBox = false;
 
     public void update() {
-        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 20), palette.get("Line"), 16f, onscreen);
-        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 35), palette.get("Line"), 12f, onscreen);
-        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 50), palette.get("Line"), 12f, onscreen);
-        write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 65), palette.get("Line"), 12f, onscreen);
-        write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 80), palette.get("Line"), 12f, onscreen);
-        write("Press 'shift' and use the mouse wheel to change the amount of circles in the animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 95), palette.get("Line"), 12f, onscreen);
+        bindControlPointToEdge();
+        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 15), palette.get("Line"), 16f, onscreen);
+        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 30), palette.get("Line"), 12f, onscreen);
+        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
+        write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 60), palette.get("Line"), 12f, onscreen);
+        write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 75), palette.get("Line"), 12f, onscreen);
+        write("Press 'shift' and use the mouse wheel to change the amount of circles in the animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 90), palette.get("Line"), 12f, onscreen);
 
         graphBezier(palette.get("Curve"), onscreen);
 
@@ -88,6 +91,16 @@ public class BezierWindow extends Window {
             drawCircle(pos, controlPointRadius, palette.get(pointKey), palette.get("Fill"), 10, onscreen);
             pos.y += (float) (controlPointRadius * 1.5);
             write(pointKey, pos, palette.get(pointKey), 12f, onscreen);
+        }
+    }
+    private void bindControlPointToEdge() {
+        for (ControlPoint point : controlPoints.values()) {
+            if (Math.abs(point.pos.x) > (width / 2.0)) {
+                point.pos.x = (float) ((width / 2.0) * Math.signum(point.pos.x) + (controlPointRadius * -1 * Math.signum(point.pos.x)));
+            }
+            if (Math.abs(point.pos.y) > (height / 2.0)) {
+                point.pos.y = (float) ((height / 2.0) * Math.signum(point.pos.y) + (controlPointRadius * -1 * Math.signum(point.pos.y)));
+            }
         }
     }
     boolean playAnimation;
@@ -331,6 +344,7 @@ public class BezierWindow extends Window {
         for (ControlPoint point : controlPoints.values()) {
             if (point.pos.distance(screen.screenToNormal(e.getX(), e.getY())) <= controlPointRadius) {
                 point.pos = screen.screenToNormal(e.getX(), e.getY());
+                bindControlPointToEdge();
                 if (playAnimation) {
                     dots = new float[dotNum];
                     for (int i = 0; i < dots.length; i++) {
@@ -363,5 +377,11 @@ public class BezierWindow extends Window {
                 }
             }
         }
+    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        super.componentResized(e);
+        screen = new Screen(width, height);
     }
 }
