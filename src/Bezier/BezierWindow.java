@@ -72,6 +72,7 @@ public class BezierWindow extends Window {
         write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
         write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 60), palette.get("Line"), 12f, onscreen);
         write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 75), palette.get("Line"), 12f, onscreen);
+        write("Press 'shift' and use the mouse wheel to change the amount of circles in the animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 90), palette.get("Line"), 12f, onscreen);
 
         graphBezier(palette.get("Curve"), onscreen);
 
@@ -132,7 +133,6 @@ public class BezierWindow extends Window {
             Vector2 pos = getPointFromT(distToT(dots[i]));
             pos = screen.normalToScreen(pos);
             drawCircle((int) pos.x, (int) pos.y, controlPointRadius / 2, palette.get("Line"), palette.get("Fill"), onscreen);
-
             dots[i] += arcLength[arcLength.length - 1] / animationSpeed;
             if (dots[i] > arcLength[arcLength.length - 1]) dots[i] = 0f;
         }
@@ -301,6 +301,7 @@ public class BezierWindow extends Window {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == 17) ctrlPressed = true;
+        if (e.getKeyCode() == 16) shiftPressed = true;
         if (e.getKeyChar() == 'b') drawBoundingBox = !drawBoundingBox;
         if (e.getKeyChar() == ' ') {
             dots = new float[dotNum];
@@ -311,9 +312,11 @@ public class BezierWindow extends Window {
         }
     }
     boolean ctrlPressed = false;
+    boolean shiftPressed = false;
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == 17) ctrlPressed = false;
+        if (e.getKeyCode() == 16) shiftPressed = false;
     }
 
     @Override
@@ -328,9 +331,11 @@ public class BezierWindow extends Window {
         for (ControlPoint point : controlPoints.values()) {
             if (point.pos.distance(screen.screenToNormal(e.getX(), e.getY())) <= controlPointRadius) {
                 point.pos = screen.screenToNormal(e.getX(), e.getY());
-                dots = new float[dotNum];
-                for (int i = 0; i < dots.length; i++) {
-                    dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
+                if (playAnimation) {
+                    dots = new float[dotNum];
+                    for (int i = 0; i < dots.length; i++) {
+                        dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
+                    }
                 }
                 break;
             }
@@ -340,10 +345,23 @@ public class BezierWindow extends Window {
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (ctrlPressed) {
-            if (Math.signum(e.getUnitsToScroll()) == -1) animationSpeed -= 10;
-            if (Math.signum(e.getUnitsToScroll()) == 1) animationSpeed += 10;
-            if (animationSpeed <= 0) animationSpeed = 1;
-            if (animationSpeed > 700) animationSpeed = 700;
+            if (playAnimation) {
+                if (Math.signum(e.getUnitsToScroll()) == -1) animationSpeed -= 10;
+                if (Math.signum(e.getUnitsToScroll()) == 1) animationSpeed += 10;
+                if (animationSpeed <= 0) animationSpeed = 1;
+                if (animationSpeed > 700) animationSpeed = 700;
+            }
+        } else if (shiftPressed) {
+            if (playAnimation) {
+                if (Math.signum(e.getUnitsToScroll()) == -1) dotNum += 2;
+                if (Math.signum(e.getUnitsToScroll()) == 1) dotNum -= 2;
+                if (dotNum <= 0) dotNum = 1;
+                if (dotNum > 35) dotNum = 35;
+                dots = new float[dotNum];
+                for (int i = 0; i < dots.length; i++) {
+                    dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
+                }
+            }
         }
     }
 }
