@@ -67,12 +67,12 @@ public class BezierWindow extends Window {
     boolean drawBoundingBox = false;
 
     public void update() {
-        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 15), palette.get("Line"), 16f, onscreen);
-        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 30), palette.get("Line"), 12f, onscreen);
-        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 45), palette.get("Line"), 12f, onscreen);
-        write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 60), palette.get("Line"), 12f, onscreen);
-        write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 75), palette.get("Line"), 12f, onscreen);
-        write("Press 'shift' and use the mouse wheel to change the amount of circles in the animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 90), palette.get("Line"), 12f, onscreen);
+        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 20), palette.get("Line"), 16f, onscreen);
+        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 35), palette.get("Line"), 12f, onscreen);
+        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 50), palette.get("Line"), 12f, onscreen);
+        write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 65), palette.get("Line"), 12f, onscreen);
+        write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 80), palette.get("Line"), 12f, onscreen);
+        write("Press 'shift' and use the mouse wheel to change the amount of circles in the animation", new Vector2((float) -width / 2 + 10, (float) -height / 2 + 95), palette.get("Line"), 12f, onscreen);
 
         graphBezier(palette.get("Curve"), onscreen);
 
