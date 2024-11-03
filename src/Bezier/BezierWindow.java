@@ -332,26 +332,38 @@ public class BezierWindow extends Window {
         if (e.getKeyCode() == 16) shiftPressed = false;
     }
 
+    ControlPoint dragPoint;
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == 3) {
             drawLines = !drawLines;
         }
+        if (e.getButton() == 1) {
+            for (ControlPoint point : controlPoints.values()) {
+                if (point.pos.distance(screen.screenToNormal(e.getX(), e.getY())) <= controlPointRadius) {
+                    dragPoint = point;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (e.getButton() == 1) {
+            dragPoint = null;
+        }
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        for (ControlPoint point : controlPoints.values()) {
-            if (point.pos.distance(screen.screenToNormal(e.getX(), e.getY())) <= controlPointRadius) {
-                point.pos = screen.screenToNormal(e.getX(), e.getY());
-                bindControlPointToEdge();
-                if (playAnimation) {
-                    dots = new float[dotNum];
-                    for (int i = 0; i < dots.length; i++) {
-                        dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
-                    }
+        if (dragPoint != null) {
+            dragPoint.pos = screen.screenToNormal(e.getX(), e.getY());
+            bindControlPointToEdge();
+            if (playAnimation) {
+                dots = new float[dotNum];
+                for (int i = 0; i < dots.length; i++) {
+                    dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
                 }
-                break;
             }
         }
     }
