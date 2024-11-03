@@ -311,6 +311,10 @@ public class BezierWindow extends Window {
         g2d.drawLine((int) pos1.x, (int) pos1.y, (int) pos2.x, (int) pos2.y);
     }
 
+    boolean ctrlPressed = false;
+    boolean shiftPressed = false;
+
+    /** Controls visuals */
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == 17) ctrlPressed = true;
@@ -324,8 +328,8 @@ public class BezierWindow extends Window {
             playAnimation = !playAnimation;
         }
     }
-    boolean ctrlPressed = false;
-    boolean shiftPressed = false;
+
+    /** Resets animations */
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == 17) ctrlPressed = false;
@@ -333,6 +337,7 @@ public class BezierWindow extends Window {
     }
 
     ControlPoint dragPoint;
+    /** Sets dragPoint to closest control point in range on mouse press */
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == 3) {
@@ -347,6 +352,7 @@ public class BezierWindow extends Window {
         }
     }
 
+    /** Resets dragPoint */
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == 1) {
@@ -354,6 +360,7 @@ public class BezierWindow extends Window {
         }
     }
 
+    /** Drags control point if dragPoint (Controlled by mousePressed() and mouseReleased()) isn't null */
     @Override
     public void mouseDragged(MouseEvent e) {
         if (dragPoint != null) {
@@ -368,6 +375,7 @@ public class BezierWindow extends Window {
         }
     }
 
+    /** Controls animation variables */
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (ctrlPressed) {
@@ -391,6 +399,7 @@ public class BezierWindow extends Window {
         }
     }
 
+    /** Resizes window on next render */
     @Override
     public void componentResized(ComponentEvent e) {
         super.componentResized(e);
