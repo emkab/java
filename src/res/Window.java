@@ -90,26 +90,30 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         graphicsScale = _graphicsScale;
         width = (int) (_width * graphicsScale);
         height = (int) (_height * graphicsScale);
-        screen = new Screen(width, height);
+
         fps = _fps;
+    }
+
+    private void windowSetup() {
+        window = new JFrame();
+        window.setSize(width, height);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        window.setLocationRelativeTo(null);
+
+
+        icon = new ImageIcon();
+        draw = new JLabel(icon);
+        window.setContentPane(draw);
+        setupBuffering();
     }
 
     public void init(String title) {
         scale = 1;
         running = true;
 
-        window = new JFrame(title);
-        window.setSize(width, height);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setLocationRelativeTo(null);
-
-        icon = new ImageIcon();
-        setupBuffering();
-        draw = new JLabel(icon);
-        window.setContentPane(draw);
-        window.setVisible(true);
-        barSize = window.getInsets().top;
-        rHeight = height - barSize;
+        windowSetup();
+        window.setTitle(title);
+        screen = new Screen(width, height);
 
         keyBindings = new HashMap<String, ArrayList<ArrayList>>();
         mouseBindings = new HashMap<Window, ArrayList<ArrayList>>();
@@ -129,6 +133,9 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         draw.requestFocus();
 
         (new Thread(this, "render")).start();
+        barSize = window.getInsets().top;
+        rHeight = height - barSize;
+        window.setVisible(true);
         (new Thread(this, "listen")).start();
     }
 
@@ -213,17 +220,22 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
 
     }
 
-    @Override
-    public void componentResized(ComponentEvent e) {
+    public void resizeComponent() {
         width = (int) draw.getBounds().getWidth();
         height = (int) draw.getBounds().getHeight();
         setupBuffering();
         barSize = window.getInsets().top;
         rHeight = height - barSize;
+        screen = new Screen(width, height);
 
         drawBackground(onscreen);
         update();
         window.repaint();
+    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        resizeComponent();
     }
 
     @Override

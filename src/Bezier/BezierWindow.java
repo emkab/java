@@ -70,12 +70,12 @@ public class BezierWindow extends Window {
 
     public void update() {
         bindControlPointToEdge();
-        write("FPS: " + Math.round(getCurrentFPS()), new Vector2((float) width / 2 - 55, (float) -rHeight / 2 + 15), palette.get("Line"), 12f, onscreen);
-        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 15), palette.get("Line"), 16f, onscreen);
-        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 30), palette.get("Line"), 12f, onscreen);
-        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 45), palette.get("Line"), 12f, onscreen);
-        write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 60), palette.get("Line"), 12f, onscreen);
-        write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 75), palette.get("Line"), 12f, onscreen);
+        write("FPS: " + Math.round(getCurrentFPS()), new Vector2((float) width / 2 - 55, (float) -rHeight / 2 + 5), palette.get("Line"), 12f, onscreen);
+        write("Drag points to edit the curve", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 5), palette.get("Line"), 16f, onscreen);
+        write("Right-click to toggle connective lines", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 20), palette.get("Line"), 12f, onscreen);
+        write("Press 'b' to toggle bounding box", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 35), palette.get("Line"), 12f, onscreen);
+        write("Press 'space' to toggle animation", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 50), palette.get("Line"), 12f, onscreen);
+        write("Press 'ctrl' and use the mouse wheel to change animation speed", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 65), palette.get("Line"), 12f, onscreen);
         write("Press 'shift' and use the mouse wheel to change the amount of circles in the animation", new Vector2((float) -width / 2 + 10, (float) -rHeight / 2 + 90), palette.get("Line"), 12f, onscreen);
 
         graphBezier(palette.get("Curve"), onscreen);
@@ -143,6 +143,13 @@ public class BezierWindow extends Window {
     int dotNum = 10;
     float animationSpeed = 500;
     private void dotAnimation() {
+        if (dragPoint != null) {
+            dots = new float[dotNum];
+            for (int i = 0; i < dots.length; i++) {
+                dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
+            }
+        }
+
         for (int i = 0; i < dots.length; i++) {
             Vector2 pos = getPointFromT(distToT(dots[i]));
             pos = screen.normalToScreen(pos);
@@ -367,12 +374,6 @@ public class BezierWindow extends Window {
         if (dragPoint != null) {
             dragPoint.pos = screen.screenToNormal(e.getX(), e.getY());
             bindControlPointToEdge();
-            if (playAnimation) {
-                dots = new float[dotNum];
-                for (int i = 0; i < dots.length; i++) {
-                    dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
-                }
-            }
         }
     }
 
@@ -404,6 +405,5 @@ public class BezierWindow extends Window {
     @Override
     public void componentResized(ComponentEvent e) {
         super.componentResized(e);
-        screen = new Screen(width, height);
     }
 }
