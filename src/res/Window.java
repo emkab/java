@@ -14,6 +14,7 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
     protected long lastUpdate;
     int fps;
     float deltaTime;
+    Duration deltaTimeDuration;
     final Object particleLock = new Object();
     protected TreeSet<String> keysDown;
     protected TreeSet<String> processedKeys;
@@ -26,11 +27,12 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
     protected ImageIcon icon;
     protected BufferedImage onscreenImage;
     protected Graphics2D onscreen;
-    protected int width, height;
+    protected int width, height, rHeight;
     double scale;
     double graphicsScale = 0.4;
     float strokeThickness = 4.0f;
     public Screen screen;
+    public int barSize;
     BasicStroke stroke;
 
     public void run() {
@@ -52,7 +54,6 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
 
     protected void renderLoop() {
         //System.out.println("RENDER LOOP STARTED");
-        Duration deltaTimeDuration;
         long time = 0;
         long startTime = System.nanoTime();
         while (running) {
@@ -66,6 +67,12 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
             deltaTimeDuration = Duration.between(beginTime, Instant.now());
             deltaTime = (float) deltaTimeDuration.getNano() / 1000000000;
         }
+    }
+
+    public float getCurrentFPS() {
+        if (deltaTimeDuration != null)
+            return 1f / deltaTime;
+        else return 0f;
     }
 
     protected boolean waitUntil(Long time) {
@@ -101,6 +108,8 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         draw = new JLabel(icon);
         window.setContentPane(draw);
         window.setVisible(true);
+        barSize = window.getInsets().top;
+        rHeight = height - barSize;
 
         keyBindings = new HashMap<String, ArrayList<ArrayList>>();
         mouseBindings = new HashMap<Window, ArrayList<ArrayList>>();
