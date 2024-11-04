@@ -27,12 +27,11 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
     protected ImageIcon icon;
     protected BufferedImage onscreenImage;
     protected Graphics2D onscreen;
-    protected int width, height, rHeight;
+    protected int width, height, rWidth, rHeight;
     double scale;
     double graphicsScale = 0.4;
     float strokeThickness = 4.0f;
     public Screen screen;
-    public int barSize;
     BasicStroke stroke;
 
     public void run() {
@@ -133,8 +132,10 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         draw.requestFocus();
 
         (new Thread(this, "render")).start();
-        barSize = window.getInsets().top;
-        rHeight = height - barSize;
+//        rWidth = width - (window.getInsets().left + window.getInsets().right);
+        int barHeight = (window.getInsets().top + window.getInsets().bottom);
+        if (barHeight < 28) barHeight = 28;
+        rHeight = height - barHeight;
         window.setVisible(true);
         (new Thread(this, "listen")).start();
     }
@@ -224,8 +225,10 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         width = (int) draw.getBounds().getWidth();
         height = (int) draw.getBounds().getHeight();
         setupBuffering();
-        barSize = window.getInsets().top;
-        rHeight = height - barSize;
+//        rWidth = width - (window.getInsets().left + window.getInsets().right);
+        int barHeight = (window.getInsets().top + window.getInsets().bottom);
+        if (barHeight < 28) barHeight = 28;
+        rHeight = height - barHeight;
         screen = new Screen(width, height);
 
         drawBackground(onscreen);
