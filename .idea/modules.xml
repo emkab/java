@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/emkab.iml" filepath="$PROJECT_DIR$/emkab.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bezier.iml" filepath="$PROJECT_DIR$/bezier.iml" />
     </modules>
   </component>
 </project>

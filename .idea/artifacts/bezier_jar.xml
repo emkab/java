@@ -1,8 +1,8 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="bezier:jar">
+  <artifact type="jar" build-on-make="true" name="bezier:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/bezier_jar</output-path>
     <root id="archive" name="bezier.jar">
-      <element id="module-output" name="emkab" />
+      <element id="module-output" name="bezier" />
     </root>
   </artifact>
 </component>
