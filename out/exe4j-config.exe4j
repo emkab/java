@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<exe4j version="9.0" transformSequenceNumber="3">
+  <directoryPresets config="E:/dev/bezier/out/artifacts/bezier_jar" />
+  <application name="emkab-bezier" distributionSourceDir="E:/dev/bezier/out/artifacts/bezier_jar" />
+  <executable name="emkab-bezier" iconSet="true" iconFile="E:/dev/bezier/out/artifacts/bezier_jar/bezierIcon.ico" executableDir="." executableMode="gui" />
+  <java mainClass="Bezier.Main" minVersion="17" maxVersion="21">
+    <classPath>
+      <archive location="E:/dev/bezier/out/artifacts/bezier_jar/bezier.jar" failOnError="false" />
+    </classPath>
+  </java>
+</exe4j>
