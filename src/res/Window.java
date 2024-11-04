@@ -218,6 +218,8 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         width = (int) draw.getBounds().getWidth();
         height = (int) draw.getBounds().getHeight();
         setupBuffering();
+        barSize = window.getInsets().top;
+        rHeight = height - barSize;
 
         drawBackground(onscreen);
         update();
