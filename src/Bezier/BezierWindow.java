@@ -250,21 +250,43 @@ public class BezierWindow extends Window {
         return new Vector2((float) x, (float) y);
     }
 
+    private void printControlPoints () {
+        int i = 0;
+        for (ControlPoint point : controlPoints.values()) {
+            System.out.print("P" + i + ": X: " + point.pos.getX() + ", Y: " + point.pos.getY() + ". ");
+            i++;
+        }
+        System.out.println();
+    }
+
     private void printSecondDerivativeRoots() {
         HashMap<String, double[]> roots = getSecondDerivativeRoots();
         double[] rootsX = roots.get("X");
         double[] rootsY = roots.get("Y");
         System.out.println("X: " + rootsX[0] + ", " + rootsX[1] + ", Y: " + rootsY[0] + ", " + rootsY[1]);
     }
+    private void printUncheckedSecondDerivativeRoots(double[] rootsX, double[] rootsY) {
+        System.out.println("X: " + rootsX[0] + ", " + rootsX[1] + ", Y: " + rootsY[0] + ", " + rootsY[1]);
+    }
+    private void printSecondDerivativeConsts(float ax, float ay, float bx, float by, float cx, float cy) {
+        System.out.print("ax: " + ax + ". ");
+        System.out.print("ay: " + ay + ". ");
+        System.out.print("bx: " + bx + ". ");
+        System.out.print("by: " + by + ". ");
+        System.out.print("cx: " + cx + ". ");
+        System.out.print("cy: " + cy + ". ");
+        System.out.println();
+    }
 
     private HashMap<String, double[]> getSecondDerivativeRoots() {
-        Vector2 P0 = controlPoints.get("P0").pos;
-        Vector2 P1 = controlPoints.get("P1").pos;
-        Vector2 P2 = controlPoints.get("P2").pos;
-        Vector2 P3 = controlPoints.get("P3").pos;
+        Vector2 P0 = controlPoints.get("P0").pos.get();
+        Vector2 P1 = controlPoints.get("P1").pos.get();
+        Vector2 P2 = controlPoints.get("P2").pos.get();
+        Vector2 P3 = controlPoints.get("P3").pos.get();
 
         float ax = -3 * P0.x + 9 * P1.x - 9 * P2.x + 3 * P3.x;
         float ay = -3 * P0.y + 9 * P1.y - 9 * P2.y + 3 * P3.y;
+        if (ay == 0) ay = 1;
 
         float bx = 6 * P0.x - 12 * P1.x + 6 * P2.x;
         float by = 6 * P0.y - 12 * P1.y + 6 * P2.y;
@@ -279,6 +301,46 @@ public class BezierWindow extends Window {
         double[] rootsY = new double[2];
         rootsY[0] = checkRoot((-by + Math.sqrt(Math.pow(by, 2) - 4 * ay * cy)) / (2 * ay));
         rootsY[1] = checkRoot((-by - Math.sqrt(Math.pow(by, 2) - 4 * ay * cy)) / (2 * ay));
+
+        HashMap<String, double[]> roots = new HashMap<>();
+        roots.put("X", rootsX);
+        roots.put("Y", rootsY);
+
+        return roots;
+    }
+
+    private HashMap<String, double[]> getSecondDerivativeRootsDEBUG() {
+        Vector2 P0 = controlPoints.get("P0").pos.get();
+        Vector2 P1 = controlPoints.get("P1").pos.get();
+        Vector2 P2 = controlPoints.get("P2").pos.get();
+        Vector2 P3 = controlPoints.get("P3").pos.get();
+
+        float ax = -3 * P0.x + 9 * P1.x - 9 * P2.x + 3 * P3.x;
+        float ay = -3 * P0.y + 9 * P1.y - 9 * P2.y + 3 * P3.y;
+//        if (ax == 0) ax = 1;
+        if (ay == 0) ay = 1;
+
+        float bx = 6 * P0.x - 12 * P1.x + 6 * P2.x;
+        float by = 6 * P0.y - 12 * P1.y + 6 * P2.y;
+
+        float cx = -3 * P0.x + 3 * P1.x;
+        float cy = -3 * P0.y + 3 * P1.y;
+
+        double[] rootsX = new double[2];
+        rootsX[0] = (-bx + Math.sqrt(Math.pow(bx, 2) - 4 * ax * cx)) / (2 * ax);
+        rootsX[1] = (-bx - Math.sqrt(Math.pow(bx, 2) - 4 * ax * cx)) / (2 * ax);
+
+        double[] rootsY = new double[2];
+        rootsY[0] = (-by + Math.sqrt(Math.pow(by, 2) - 4 * ay * cy)) / (2 * ay);
+        rootsY[1] = (-by - Math.sqrt(Math.pow(by, 2) - 4 * ay * cy)) / (2 * ay);
+
+        printControlPoints();
+        printUncheckedSecondDerivativeRoots(rootsX, rootsY);
+        printSecondDerivativeConsts(ax, ay, bx, by, cx, cy);
+        rootsX[0] = checkRoot(rootsX[0]);
+        rootsX[1] = checkRoot(rootsX[1]);
+        rootsY[0] = checkRoot(rootsY[0]);
+        rootsY[1] = checkRoot(rootsY[1]);
 
         HashMap<String, double[]> roots = new HashMap<>();
         roots.put("X", rootsX);
@@ -329,10 +391,12 @@ public class BezierWindow extends Window {
         if (e.getKeyCode() == 16) shiftPressed = true;
         if (e.getKeyChar() == 'b') drawBoundingBox = !drawBoundingBox;
         if (e.getKeyChar() == ' ') {
-            dots = new float[dotNum];
-            for (int i = 0; i < dots.length; i++) {
-                dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
-            }
+                if (!playAnimation) {
+                    dots = new float[dotNum];
+                    for (int i = 0; i < dots.length; i++) {
+                        dots[i] = i * (arcLength[arcLength.length - 1] / dotNum);
+                    }
+                }
             playAnimation = !playAnimation;
         }
     }
