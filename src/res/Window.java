@@ -131,13 +131,13 @@ public class Window implements Runnable, ActionListener, MouseListener, MouseMot
         draw.addKeyListener(this);
         draw.requestFocus();
 
+        (new Thread(this, "listen")).start();
         (new Thread(this, "render")).start();
 //        rWidth = width - (window.getInsets().left + window.getInsets().right);
         int barHeight = (window.getInsets().top + window.getInsets().bottom);
         if (barHeight < 28) barHeight = 28;
         rHeight = height - barHeight;
         window.setVisible(true);
-        (new Thread(this, "listen")).start();
     }
 
     public void drawCircle(int x, int y, int r, Color color, Color fillColor, Graphics2D g2d) {
